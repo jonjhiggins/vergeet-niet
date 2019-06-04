@@ -1,0 +1,22 @@
+.day {
+    padding: 10px;
+}
+
+.date input,
+.date-form button {
+    display: block;
+    border: 1px solid;
+    background-color: transparent;
+}
+
+.date-text {
+    margin: 0;
+    border: 0;
+    font-size: 1em;
+    background-color: transparent;
+    padding: 0;
+}
+
+.date-text:hover {
+    border-bottom: 1px solid;
+}

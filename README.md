@@ -1,3 +1,8 @@
+# vergeet-niet
+
+A project to try out React Hooks: keep track of music you love by storing up to five songs a day.
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

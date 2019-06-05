@@ -2,8 +2,8 @@ import React from "react";
 import "./Song.css";
 
 export default ({ artistName, songName, index, editing, handleChange }) => {
-  const artistFieldName = `artistName${index}`
-  const songFieldName = `songName${index}`
+  const artistFieldName = `artistName`
+  const songFieldName = `songName`
   return (
     <section className="song">
       {editing && (
@@ -13,9 +13,9 @@ export default ({ artistName, songName, index, editing, handleChange }) => {
             <input
               type="text"
               name={artistFieldName}
+              data-index={index}
               defaultValue={artistName}
               onChange={handleChange}
-              required
             />
           </label>
           <label>
@@ -23,15 +23,15 @@ export default ({ artistName, songName, index, editing, handleChange }) => {
             <input
               type="text"
               name={songFieldName}
+              data-index={index}
               defaultValue={songName}
               onChange={handleChange}
-              required
             />
           </label>
         </div>
       )}
 
-      {!editing && (
+      {!editing && artistName !== '' && (
         <p>
           <span>{artistName}</span> - <span>{songName}</span>
         </p>

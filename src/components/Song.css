@@ -1,4 +1,14 @@
 .song {
+    margin-top: 1rem;
     border-bottom: 1px dashed;
     padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+.song:empty {
+    display: none;
+}
+
+.song p {
+    margin-bottom: 0;
 }

@@ -27,6 +27,11 @@ button {
   background-color: transparent;
 }
 
+input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 input::placeholder {
   color: #999;
 }

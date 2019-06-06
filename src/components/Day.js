@@ -7,39 +7,41 @@ import "./Day.css";
 /**
  * Container for a number of songs for a specific date.
  */
-export default () => {
-  const getDate = () => {
+export default ({ editing, fullscreen, day }) => {
+  const getDate = dateObj => {
     try {
-      return new Date().toISOString().split("T")[0];
+      return dateObj.toISOString().split("T")[0];
     } catch (e) {
       return "";
     }
   };
   const [dayData, setDayData] = useState({
-    dirty: true,
-    date: getDate(),
-    songs: [
-      {
-        artistName: "",
-        songName: ""
-      },
-      {
-        artistName: "",
-        songName: ""
-      },
-      {
-        artistName: "",
-        songName: ""
-      },
-      {
-        artistName: "",
-        songName: ""
-      },
-      {
-        artistName: "",
-        songName: ""
-      }
-    ]
+    dirty: editing,
+    date: day ? getDate(new Date(day.date.toDate())) : getDate(new Date()),
+    songs: day
+      ? day.songs
+      : [
+          {
+            artistName: "",
+            songName: ""
+          },
+          {
+            artistName: "",
+            songName: ""
+          },
+          {
+            artistName: "",
+            songName: ""
+          },
+          {
+            artistName: "",
+            songName: ""
+          },
+          {
+            artistName: "",
+            songName: ""
+          }
+        ]
   });
 
   const tempDayData = Object.assign({}, dayData);
@@ -52,13 +54,14 @@ export default () => {
       dirty: false
     });
     const db = firebase.firestore();
-    db.settings({
-      timestampsInSnapshots: true
-    });
-    db.collection("users").doc("jonjhiggins").collection("days").doc(dayData.date).set({
-      date: firebase.firestore.Timestamp.fromDate(new Date(dayData.date)),
-      songs: dayData.songs
-    });
+    db.collection("users")
+      .doc("jonjhiggins")
+      .collection("days")
+      .doc(dayData.date)
+      .set({
+        date: firebase.firestore.Timestamp.fromDate(new Date(dayData.date)),
+        songs: dayData.songs
+      });
   };
 
   const handleChange = e => {
@@ -82,39 +85,39 @@ export default () => {
     });
   };
   return (
-    <article className="day">
-      <form className="day-form" onSubmit={handleSubmit}>
-        <h1>Add songs</h1>
-        <DateBlock
-          date={dayData.date}
-          editing={dayData.dirty}
-          handleChange={handleChange}
-        />
-        <div className="songs">
-          {dayData.songs.map(({ artistName, songName }, index) => (
-            <Song
-              handleChange={handleChange}
-              editing={dayData.dirty}
-              artistName={artistName}
-              songName={songName}
-              key={index}
-              index={index}
-            />
-          ))}
-        </div>
-        <footer className="submit-footer">
-          {dayData.dirty && (
-            <button type="submit">
-              <span role="presentation">✔</span> Save
-            </button>
-          )}
-          {!dayData.dirty && (
-            <button type="button" onClick={handleEdit}>
-              <span role="presentation">✎</span> Edit
-            </button>
-          )}
-        </footer>
-      </form>
-    </article>
+    <form
+      className={`day-form ${fullscreen ? "day-form-fullscreen" : ""}`}
+      onSubmit={handleSubmit}
+    >
+      <DateBlock
+        date={dayData.date}
+        editing={dayData.dirty}
+        handleChange={handleChange}
+      />
+      <div className="songs">
+        {dayData.songs.map(({ artistName, songName }, index) => (
+          <Song
+            handleChange={handleChange}
+            editing={dayData.dirty}
+            artistName={artistName}
+            songName={songName}
+            key={index}
+            index={index}
+          />
+        ))}
+      </div>
+      <footer className="submit-footer">
+        {dayData.dirty && (
+          <button type="submit">
+            <span role="presentation">✔</span> Save
+          </button>
+        )}
+        {!dayData.dirty && (
+          <button type="button" onClick={handleEdit}>
+            <span role="presentation">✎</span> Edit
+          </button>
+        )}
+      </footer>
+    </form>
   );
 };

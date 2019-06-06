@@ -1,4 +1,5 @@
-import firebase from "firebase";
+import * as firebase from "firebase/app";
+import "firebase/firestore";
 const config = {
   apiKey: "AIzaSyD1UlbXJ_epEeoxGZwAwOCBmOjl7fn9hs8",
   authDomain: "vergeet-niet.firebaseapp.com",

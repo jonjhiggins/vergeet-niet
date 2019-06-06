@@ -23,23 +23,23 @@ export default ({ editing, fullscreen, day }) => {
       : [
           {
             artistName: "",
-            songName: ""
+            trackName: ""
           },
           {
             artistName: "",
-            songName: ""
+            trackName: ""
           },
           {
             artistName: "",
-            songName: ""
+            trackName: ""
           },
           {
             artistName: "",
-            songName: ""
+            trackName: ""
           },
           {
             artistName: "",
-            songName: ""
+            trackName: ""
           }
         ]
   });
@@ -67,14 +67,14 @@ export default ({ editing, fullscreen, day }) => {
   const handleChange = e => {
     const { name, value } = e.target;
     const isArtistName = name.search("artistName") === 0;
-    const isSongName = name.search("songName") === 0;
-    if (!isArtistName && !isSongName) {
+    const istrackName = name.search("trackName") === 0;
+    if (!isArtistName && !istrackName) {
       tempDayData[name] = value;
       return;
     }
-    // Handle song fields differently as they are in array
+    // Handle track fields differently as they are in array
     const index = parseInt(e.target.getAttribute("data-index"), 10);
-    const fieldName = isArtistName ? "artistName" : "songName";
+    const fieldName = isArtistName ? "artistName" : "trackName";
     tempDayData.songs[index][fieldName] = value;
   };
 
@@ -95,12 +95,12 @@ export default ({ editing, fullscreen, day }) => {
         handleChange={handleChange}
       />
       <div className="songs">
-        {dayData.songs.map(({ artistName, songName }, index) => (
+        {dayData.songs.map(({ artistName, trackName }, index) => (
           <Song
             handleChange={handleChange}
             editing={dayData.dirty}
             artistName={artistName}
-            songName={songName}
+            trackName={trackName}
             key={index}
             index={index}
           />

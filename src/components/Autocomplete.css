@@ -1,0 +1,37 @@
+
+.autocomplete {
+    height: 20rem;
+    overflow: scroll;
+    position: absolute;
+    width: calc(100%);
+    box-sizing: border-box;
+    background-color: #fff;
+    z-index: 10;
+    border: 1px solid #999;
+    border-top: none;
+    margin-top: -1rem;
+    padding: 0.75rem 0;
+}
+
+.autocomplete ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.autocomplete li {
+    padding:0;
+}
+
+.autocomplete button {
+    border: 0;
+    margin: 0;
+    padding: 0.5em;
+    display: block;
+    width: 100%;
+    text-align: left;
+}
+
+.autocomplete button:hover {
+    background-color: #ccc;
+}

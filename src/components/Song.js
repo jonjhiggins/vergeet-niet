@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import Autocomplete from "./Autocomplete";
+import React, { useState, useEffect } from "react";
+import Autocomplete from "accessible-autocomplete/react";
 import "./Song.css";
+import "accessible-autocomplete/src/autocomplete.css";
 
 export default ({
   artistName = "",
@@ -11,11 +12,7 @@ export default ({
 }) => {
   const [songData, setSongData] = useState({
     artistName,
-    trackName,
-    autocomplete: {
-      artistName: [],
-      trackName: []
-    }
+    trackName
   });
 
   const artistFieldName = `artistName`;
@@ -24,35 +21,15 @@ export default ({
   let controller = new AbortController();
   let signal = controller.signal;
 
-  let keyupTimeout = null;
-
-  const handleKeyup = e => {
-    clearTimeout(keyupTimeout);
-    controller.abort();
-    const searchTerm = e.target.value;
-    const fieldName = e.target.name;
-    keyupTimeout = setTimeout(() => {
-      handleSearch(searchTerm, fieldName);
-    }, 300);
-  };
-
-  const handleInputChange = e => {
-    setSongData({
-      ...songData,
-      [e.target.name]: e.target.value,
-      autocomplete: {
-        ...songData.autocomplete,
-        [e.target.name]: []
-      }
-    });
-    handleChange(e);
-  };
-
-  const handleSearch = (searchTerm, fieldName) => {
+  const handleSearch = (searchTerm, fieldName, callback) => {
     if (searchTerm.length < 3) {
       return;
     }
-    if (fieldName === trackFieldName && songData.artistName === "") {
+
+    if (
+      fieldName === trackFieldName &&
+      (songData.artistName === "" || !songData.artistName)
+    ) {
       return;
     }
 
@@ -63,66 +40,53 @@ export default ({
       songData.artistName
     }&format=json`;
     const url = fieldName === artistFieldName ? urlArtist : urlTrack;
+    controller.abort();
     controller = new AbortController();
     signal = controller.signal;
 
     const request = new Request(url, { signal });
-    fetch(request)
+    return fetch(request)
       .then(response => response.json())
       .then(json => handleResponse(fieldName, json))
+      .then(results => callback(results))
       .catch(handleFail);
   };
 
-  const handleResponse = (fieldName, json) => {
+  const handleResponse = (fieldName, json, callback) => {
     try {
-      setSongData({
-        ...songData,
-        autocomplete: {
-          ...songData.autocomplete,
-          artistName:
-            fieldName === artistFieldName
-              ? json.results.artistmatches.artist
-              : [],
-          trackName:
-            fieldName === trackFieldName ? json.results.trackmatches.track : []
-        }
-      });
+      const results = fieldName === artistFieldName
+        ? json.results.artistmatches.artist
+        : json.results.trackmatches.track;
+      return results.map(item => item.name);
     } catch (e) {
       handleFail(e);
     }
   };
 
+  // Pass state changes up to parent
+  useEffect(() => {
+    handleChange(index, songData)
+  })
+
   const handleFail = e => {
-    setSongData({
-      ...songData,
-      autocomplete: {
-        ...songData.autocomplete,
-        artistName: [],
-        trackName: []
-      }
-    });
     console.log(e);
   };
 
-  const setArtist = artist => {
-    setSongData({
-      ...songData,
-      artistName: artist,
-      autocomplete: {
-        ...songData.autocomplete,
-        artistName: []
-      }
-    });
+  const handleArtistSearch = (query, populateResults) => {
+    handleSearch(query, artistFieldName, populateResults);
   };
 
-  const setSong = song => {
+  const handleTrackSearch = (query, populateResults) => {
+    handleSearch(query, trackFieldName, populateResults);
+  };
+
+  const handleConfirm = (fieldName, value) => {
+    if (!value || !fieldName) {
+      return;
+    }
     setSongData({
       ...songData,
-      trackName: song,
-      autocomplete: {
-        ...songData.autocomplete,
-        trackName: []
-      }
+      [fieldName]: value
     });
   };
 
@@ -132,39 +96,23 @@ export default ({
         <div>
           <label>
             Artist {index + 1}
-            <input
-              type="text"
+            <Autocomplete
+              onConfirm={handleConfirm.bind(null, artistFieldName)}
               name={artistFieldName}
-              onKeyUp={handleKeyup}
+              defaultValue={songData.artistName}
               data-index={index}
-              value={songData.artistName}
-              onChange={handleInputChange}
-              autoComplete={"off"}
+              source={handleArtistSearch}
             />
-            {songData.autocomplete.artistName.length > 0 && (
-              <Autocomplete
-                autocompleteItems={songData.autocomplete.artistName}
-                handleClick={setArtist}
-              />
-            )}
           </label>
           <label>
             Track {index + 1}
-            <input
-              type="text"
+            <Autocomplete
+              onConfirm={handleConfirm.bind(null, trackFieldName)}
               name={trackFieldName}
-              onKeyUp={handleKeyup}
+              defaultValue={songData.trackName}
               data-index={index}
-              value={songData.trackName}
-              onChange={handleInputChange}
-              autoComplete={"off"}
+              source={handleTrackSearch}
             />
-            {songData.autocomplete.trackName.length > 0 && (
-              <Autocomplete
-                autocompleteItems={songData.autocomplete.trackName}
-                handleClick={setSong}
-              />
-            )}
           </label>
         </div>
       )}

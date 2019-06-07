@@ -64,18 +64,13 @@ export default ({ editing, fullscreen, day }) => {
       });
   };
 
-  const handleChange = e => {
+  const handleDateChange = e => {
     const { name, value } = e.target;
-    const isArtistName = name.search("artistName") === 0;
-    const istrackName = name.search("trackName") === 0;
-    if (!isArtistName && !istrackName) {
-      tempDayData[name] = value;
-      return;
-    }
-    // Handle track fields differently as they are in array
-    const index = parseInt(e.target.getAttribute("data-index"), 10);
-    const fieldName = isArtistName ? "artistName" : "trackName";
-    tempDayData.songs[index][fieldName] = value;
+    tempDayData[name] = value;
+  };
+
+  const handleSongChange = (index, songData) => {
+    tempDayData.songs[index] = songData;
   };
 
   const handleEdit = e => {
@@ -92,12 +87,12 @@ export default ({ editing, fullscreen, day }) => {
       <DateBlock
         date={dayData.date}
         editing={dayData.dirty}
-        handleChange={handleChange}
+        handleChange={handleDateChange}
       />
       <div className="songs">
         {dayData.songs.map(({ artistName, trackName }, index) => (
           <Song
-            handleChange={handleChange}
+            handleChange={handleSongChange}
             editing={dayData.dirty}
             artistName={artistName}
             trackName={trackName}
